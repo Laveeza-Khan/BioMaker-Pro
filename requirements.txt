@@ -2,3 +2,5 @@ streamlit
 wikipedia
 stmol
 py3Dmol
+ipython_genutils
+ipywidgets
