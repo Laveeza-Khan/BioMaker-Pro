@@ -3,43 +3,56 @@ import wikipedia
 import stmol
 import py3Dmol
 
-st.set_page_config(page_title="BioMaker Pro", layout="wide")
+# 1. Dynamic PDB Mapping (Better Dictionary)
+# Humne main viral pathogens ki list barha di hai
+pdb_dict = {
+    "Polio": "1PIV",
+    "Zika": "5IRE",
+    "SARS-CoV-2": "6VXX",
+    "Ebola": "4IDB",
+    "Rabies": "6V5B",
+    "Influenza": "1RVX",
+    "Hepatitis B": "2I6Z",
+    "Adenovirus": "6CGV",
+    "Bacteriophage T4": "1X9B",
+    "HIV": "1HVI"
+}
 
-st.title("BioMaker 2.0: Disease Intelligence 🧬")
+st.title("🧬 BioMaker-Pro 2.0")
+st.markdown("---")
 
-# Search Input
-virus_query = st.text_input("Search for a Virus (e.g., Polio, Zika, SARS-CoV-2):", "")
+# User Input
+virus_name = st.text_input("Enter Virus Name (e.g. Polio, Ebola, Zika):", "Polio")
 
-if virus_query:
+if virus_name:
+    # 2. Taxonomy & Info from Wikipedia
     try:
-        with st.spinner('Fetching Bio-Data...'):
-            # Wikipedia summary
-            result = wikipedia.summary(f"{virus_query} virus", sentences=3)
-            
-            tab1, tab2 = st.tabs(["Classification & Overview", "3D Structure"])
-            
-            with tab1:
-                st.subheader(f"About {virus_query}")
-                st.info(result)
-            
-            with tab2:
-                st.subheader("3D Molecular Visualization")
-                # Default PDB IDs for common viruses
-                pdb_map = {"Polio": "1PIV", "Zika": "5IRE", "SARS-CoV-2": "6VXX"}
-                
-                # Check if we have a specific PDB, else use a generic protein
-                pdb_id = "1AIE" # Default example
-                for key in pdb_map:
-                    if key.lower() in virus_query.lower():
-                        pdb_id = pdb_map[key]
-                
-                st.write(f"Viewing PDB Structure: **{pdb_id}**")
-                view = py3Dmol.view(query=f'pdb:{pdb_id}')
-                view.setStyle({'cartoon': {'color': 'spectrum'}})
-                stmol.showmol(view, height=500, width=800)
+        summary = wikipedia.summary(f"{virus_name} virus", sentences=3)
+        st.subheader(f"About {virus_name}")
+        st.write(summary)
+    except:
+        st.warning("Could not fetch details from Wikipedia.")
 
-    except Exception as e:
-        st.error(f"Error: {e}")
+    # 3. Dynamic 3D Visualization & Error Handling
+    st.subheader("3D Molecular Structure")
+    
+    # Check if we have the PDB ID for this virus
+    # Hum search karte hain ke user ka input hamari list mein hai ya nahi
+    pdb_id = None
+    for key in pdb_dict:
+        if key.lower() in virus_name.lower():
+            pdb_id = pdb_dict[key]
+            break
 
-st.write("---")
-st.caption("Developed by Laveeza Khan | University of Karachi")
+    if pdb_id:
+        st.info(f"Showing PDB Structure: {pdb_id}")
+        # Rendering the 3D model
+        view = py3Dmol.view(query=f'pdb:{pdb_id}')
+        view.setStyle({'cartoon': {'color': 'spectrum'}})
+        stmol.show2stmol(view, height=400)
+    else:
+        # Agar structure nahi mila toh error message
+        st.error(f"Sorry! 3D structure for '{virus_name}' is not in our database yet.")
+        st.info("💡 Try searching: Polio, SARS-CoV-2, Ebola, or Zika.")
+
+st.sidebar.info("Developed by Laveeza Khan | Biotech @ KU")
