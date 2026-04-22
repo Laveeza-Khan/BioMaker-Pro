@@ -1,3 +1,7 @@
+# 🧬 BioMaker-Pro: Viral Encyclopedia
+![Visitor Badge](https://api.visitorbadge.io/api/visitors?path=Laveeza-Khan/BioMaker-Pro&label=TOTAL%20VIEWS&countColor=%23263159)
+
+A professional biotechnology tool to explore viral taxonomy, clinical symptoms, and Biosafety Levels (BSL).
 # 🧬 BioMaker-Pro: Viral Encyclopedia & Biosafety Guide
 
 **BioMaker-Pro** is a comprehensive digital encyclopedia designed for biotechnology students and researchers to quickly access viral clinical data and biosafety protocols.
