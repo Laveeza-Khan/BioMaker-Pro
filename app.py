@@ -1,50 +1,72 @@
 import streamlit as st
 import wikipedia
-import stmol
-import py3Dmol
 
-# 1. PDB Mapping
-pdb_dict = {
-    "Polio": "1PIV",
-    "Zika": "5IRE",
-    "SARS-CoV-2": "6VXX",
-    "Ebola": "4IDB",
-    "Rabies": "6V5B",
-    "Influenza": "1RVX",
-    "Hepatitis": "2I6Z",
-    "Adenovirus": "6CGV",
-    "HIV": "1HVI"
+# Dictionary for manual data (Symptons & Route of Entry)
+# Aap is list mein mazeed viruses add kar sakti hain
+virus_data = {
+    "Polio": {
+        "Symptoms": "Fever, sore throat, headache, vomiting, fatigue, stiffness in the back and neck.",
+        "Route": "Fecal-oral route (contaminated water or food).",
+        "Target": "Central Nervous System (Motor neurons)."
+    },
+    "Zika": {
+        "Symptoms": "Fever, rash, conjunctivitis, muscle and joint pain, malaise, headache.",
+        "Route": "Aedes mosquito bite, sexual transmission, blood transfusion.",
+        "Target": "Neural progenitor cells."
+    },
+    "SARS-CoV-2": {
+        "Symptoms": "Fever, cough, tiredness, loss of taste or smell, difficulty breathing.",
+        "Route": "Respiratory droplets and aerosols.",
+        "Target": "Respiratory system (ACE2 receptors)."
+    },
+    "Ebola": {
+        "Symptoms": "Fever, severe headache, muscle pain, weakness, fatigue, diarrhea, unexplained bleeding.",
+        "Route": "Direct contact with infected blood or body fluids.",
+        "Target": "Immune cells and endothelial cells."
+    }
 }
 
-st.title("🧬 BioMaker-Pro 2.0")
-st.markdown("Developed by Laveeza Khan | Biotech @ KU")
+st.set_page_config(page_title="BioMaker-Pro", page_icon="🧬")
 
-virus_name = st.text_input("Enter Virus Name:", "Polio")
+st.title("🧬 BioMaker-Pro: Viral Encyclopedia")
+st.markdown(f"**Developer:** Laveeza Khan | 3rd Year Biotech Student @ KU")
+st.markdown("---")
+
+# User Input
+virus_name = st.text_input("Enter Virus Name (e.g. Polio, Zika, Ebola, SARS-CoV-2):", "Polio")
 
 if virus_name:
-    # Wikipedia Info
+    # 1. Fetching Summary from Wikipedia
     try:
-        summary = wikipedia.summary(f"{virus_name} virus", sentences=3)
-        st.subheader(f"About {virus_name}")
-        st.write(summary)
+        # Wikipedia se summary nikalna
+        wiki_summary = wikipedia.summary(f"{virus_name} virus", sentences=4)
+        st.subheader("📌 Overview")
+        st.write(wiki_summary)
     except:
-        st.write("Information fetching...")
+        st.warning("General overview fetched from database.")
 
-    # 3D Structure
-    st.subheader("3D Molecular Structure")
+    # 2. Taxonomy & Clinical Details
+    st.markdown("### 📊 Clinical & Biological Profile")
     
-    pdb_id = None
-    for key in pdb_dict:
+    # Check if we have extra data for this virus
+    found = False
+    for key in virus_data:
         if key.lower() in virus_name.lower():
-            pdb_id = pdb_dict[key]
+            data = virus_data[key]
+            
+            # Creating nice boxes for info
+            col1, col2 = st.columns(2)
+            with col1:
+                st.info(f"**🚪 Route of Entry:**\n{data['Route']}")
+            with col2:
+                st.warning(f"**🎯 Target:**\n{data['Target']}")
+            
+            st.error(f"**🤒 Common Symptoms:**\n{data['Symptoms']}")
+            found = True
             break
+            
+    if not found:
+        st.info("Additional clinical data for this specific virus is being updated in our database.")
 
-    if pdb_id:
-        st.info(f"PDB ID: {pdb_id}")
-        view = py3Dmol.view(query=f'pdb:{pdb_id}')
-        view.setStyle({'cartoon': {'color': 'spectrum'}})
-        view.zoomTo()
-        # Sab se stable function use kar rahe hain
-        stmol.show2stmol(view, height=400)
-    else:
-        st.warning("Structure not in list, try Polio or Zika.")
+st.sidebar.markdown("---")
+st.sidebar.write("🧪 **Project Scope:** This tool provides rapid access to viral taxonomy and clinical symptoms for biotech students.")
