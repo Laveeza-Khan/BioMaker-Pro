@@ -78,9 +78,8 @@ virus_data = {
 st.set_page_config(page_title="BioMaker-Pro", page_icon="🧬")
 
 st.title("🧬 BioMaker-Pro: Viral Encyclopedia")
-st.markdown(f"**Developer:** Laveeza Khan | 3rd Year Biotech Student @ KU")
+st.markdown("**Developer:** Laveeza Khan")
 st.markdown("---")
-
 virus_name = st.text_input("Search Virus (e.g. Lambda, Ebola, Dengue, Polio):", "Polio")
 
 if virus_name:
