@@ -115,4 +115,19 @@ if virus_name:
     if not found:
         st.warning("Clinical details for this virus are not in the local database, but you can read the Wikipedia overview above!")
 
-st.sidebar.info("💡 **Fun Fact:** Bacteriophages are being researched as 'Phage Therapy' to kill antibiotic-resistant bacteria!")
+# --- Fun Facts Section in Sidebar ---
+st. sidebar.markdown("---")
+st. sidebar.subheader("💡 Did You Know?")
+
+facts = [
+    "Bacteriophages are being researched as 'Phage Therapy' to kill antibiotic-resistant bacteria!",
+    "Viruses are not technically 'alive' because they cannot reproduce without a host cell.",
+    "The MimiVirus is so large that it was originally mistaken for a bacterium!",
+    "About 8% of human DNA actually comes from ancient viruses that infected our ancestors.",
+    "Some viruses can survive being frozen for thousands of years in permafrost.",
+    "The word 'virus' comes from a Latin word meaning 'poison' or 'slimy liquid'."
+]
+
+# Randomly aik fact select karke dikhane ke liye
+random_fact = random.choice(facts)
+st.sidebar.info(random_fact)
