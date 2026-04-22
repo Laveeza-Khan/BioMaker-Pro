@@ -1,6 +1,5 @@
 streamlit
+wikipedia-api
 wikipedia
-stmol
+stmol==0.0.9
 py3Dmol
-ipython_genutils
-ipywidgets
