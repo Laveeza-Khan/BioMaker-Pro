@@ -2,132 +2,94 @@ import streamlit as st
 import wikipedia
 import random
 
-# Extended Dictionary: Viruses data without emojis
-virus_data = {
-    "Polio": {
-        "Symptoms": "Fever, sore throat, vomiting, fatigue, stiffness in back/neck.",
-        "Route": "Fecal-oral route (contaminated water/food).",
-        "Target": "Motor neurons in the Central Nervous System.",
-        "BSL": "2",
-        "BSL_Info": "Standard lab safety with protective gear."
-    },
-    "Zika": {
-        "Symptoms": "Fever, rash, joint pain, red eyes.",
-        "Route": "Aedes mosquito bite, sexual transmission.",
-        "Target": "Neural progenitor cells.",
-        "BSL": "2",
-        "BSL_Info": "Standard containment; special care for pregnant staff."
-    },
-    "SARS-CoV-2": {
-        "Symptoms": "Fever, cough, loss of taste/smell, breathing issues.",
-        "Route": "Respiratory droplets (coughing/sneezing).",
-        "Target": "Respiratory system (Lungs).",
-        "BSL": "3",
-        "BSL_Info": "High-level containment with specialized ventilation (Negative pressure)."
-    },
-    "Ebola": {
-        "Symptoms": "Internal/external bleeding, fever, severe headache.",
-        "Route": "Direct contact with infected body fluids.",
-        "Target": "Immune cells and blood vessel linings.",
-        "BSL": "4",
-        "BSL_Info": "Maximum containment! Positive pressure suits required."
-    },
-    "Bacteriophage": {
-        "Symptoms": "None (Infects bacteria only).",
-        "Route": "Direct contact with host bacteria.",
-        "Target": "Specific Bacterial cells (e.g., E. coli).",
-        "BSL": "1",
-        "BSL_Info": "Generally safe; handled in basic microbiology labs."
-    },
-    "Lambda": {
-        "Symptoms": "Infects bacteria (non-pathogenic to humans).",
-        "Route": "Infection of E. coli through the LamB receptor.",
-        "Target": "E. coli bacteria (Lysogenic/Lytic cycles).",
-        "BSL": "1",
-        "BSL_Info": "Basic lab safety; widely used in genetic research."
-    },
-    "Dengue": {
-        "Symptoms": "High fever, severe joint/muscle pain, rash.",
-        "Route": "Aedes aegypti mosquito bite.",
-        "Target": "Monocytes and macrophages.",
-        "BSL": "2",
-        "BSL_Info": "Standard BSL-2 practices; avoid needle sticks."
-    },
-    "Smallpox": {
-        "Symptoms": "High fever, fatigue, and characteristic skin rashes (pustules).",
-        "Route": "Face-to-face contact, infected droplets.",
-        "Target": "Skin cells and lymph nodes.",
-        "BSL": "4",
-        "BSL_Info": "Only handled in extremely secure WHO-authorized labs."
-    },
-    "HIV": {
-        "Symptoms": "Flu-like symptoms initially, weight loss, weak immune system.",
-        "Route": "Blood or sexual contact.",
-        "Target": "CD4+ T cells.",
-        "BSL": "2/3",
-        "BSL_Info": "BSL-2 for tests; BSL-3 for research/culture."
-    },
-    "MERS": {
-        "Symptoms": "Severe respiratory illness, fever, cough, shortness of breath.",
-        "Route": "Zoonotic (from camels) and respiratory droplets.",
-        "Target": "Lower respiratory tract.",
-        "BSL": "3",
-        "BSL_Info": "Requires BSL-3 containment and specialized PPE."
+# --- Professional Theme & CSS ---
+st.set_page_config(page_title="BioMaker-Pro", layout="wide")
+
+st.markdown("""
+    <style>
+    .main {
+        background-color: #f0f2f6;
     }
-}
+    .stTextInput > div > div > input {
+        background-color: #ffffff;
+    }
+    .reportview-container .main .block-container {
+        padding-top: 2rem;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-st.set_page_config(page_title="BioMaker-Pro")
-
-st.title("BioMaker-Pro: Viral Encyclopedia")
+# --- Title and Header ---
+st.title("BioMaker-Pro: Automated Viral Encyclopedia")
 st.markdown("Developer: Laveeza Khan")
 st.markdown("---")
 
-virus_name = st.text_input("Search Virus (e.g. Lambda, Ebola, Dengue, Polio):", "Polio")
+# --- User Input ---
+virus_name = st.text_input("Search Virus (e.g. Rabies, Dengue, Ebola, Hepatitis):", "Rabies")
 
 if virus_name:
     try:
-        wiki_summary = wikipedia.summary(f"{virus_name} virus", sentences=3)
+        # Search for the page
+        page = wikipedia.page(f"{virus_name} virus")
+        url = page.url
+        summary = wikipedia.summary(f"{virus_name} virus", sentences=3)
+        
+        # Overview Section
         st.subheader("Overview")
-        st.write(wiki_summary)
-    except:
-        st.info("Fetching overview from database...")
+        st.write(summary)
+        st.caption(f"Source: [Wikipedia]({url})")
 
-    st.markdown("### Clinical and Biosafety Profile")
-    
-    found = False
-    search_query = virus_name.lower()
-    for key in virus_data:
-        if key.lower() in search_query:
-            data = virus_data[key]
+        st.markdown("---")
+        
+        # Automated Data Extraction Section
+        st.subheader("Automated Clinical and Biological Profile")
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.info("Biological Classification")
+            # Yahan hum Taxonomy nikalne ki koshish karte hain
+            content = page.content.lower()
             
-            st.error(f"Biosafety Level (BSL): {data['BSL']}")
-            st.caption(f"Security Requirement: {data['BSL_Info']}")
-
-            col1, col2 = st.columns(2)
-            with col1:
-                st.info(f"Route of Entry:\n{data['Route']}")
-            with col2:
-                st.warning(f"Target:\n{data['Target']}")
+            # Simple Logic to find Family
+            if "family" in content:
+                try:
+                    family = content.split("family")[1].split(".")[0].split("\n")[0]
+                    st.write(f"**Family:** {family.capitalize()}")
+                except:
+                    st.write("**Family:** Information available on full page.")
             
-            st.success(f"Symptoms:\n{data['Symptoms']}")
-            found = True
-            break
+            # Setting BSL based on virus danger (Logic)
+            danger_words = ["high mortality", "fatal", "ebola", "sars", "mers", "smallpox", "marburg"]
+            if any(word in content for word in danger_words):
+                bsl_level = "3 or 4"
+            else:
+                bsl_level = "2"
+            st.error(f"Estimated Biosafety Level (BSL): {bsl_level}")
+
+        with col2:
+            st.warning("Clinical Characteristics")
+            # Extracting potential symptoms
+            if "symptoms" in content:
+                symptoms_text = content.split("symptoms")[1].split(".")[0:2]
+                st.write(f"**Potential Symptoms:** {'. '.join(symptoms_text).capitalize()}.")
+            else:
+                st.write("**Symptoms:** Please refer to the clinical summary above.")
             
-    if not found:
-        st.info("Additional clinical details for this virus are not in the local database.")
+            if "transmission" in content:
+                trans = content.split("transmission")[1].split(".")[0]
+                st.write(f"**Route of Entry:** {trans.capitalize()}.")
 
-# Sidebar Facts without emojis
-st.sidebar.markdown("---")
-st.sidebar.subheader("Did You Know?")
+    except Exception as e:
+        st.error("Could not find specific automated data for this virus. Please try a more specific name.")
 
+# --- Sidebar Facts ---
+st.sidebar.subheader("Viral Knowledge Base")
 facts = [
-    "Bacteriophages are being researched as Phage Therapy to kill antibiotic-resistant bacteria.",
-    "Viruses are not technically alive because they cannot reproduce without a host cell.",
-    "The MimiVirus is so large that it was originally mistaken for a bacterium.",
-    "About 8 percent of human DNA actually comes from ancient viruses.",
-    "Some viruses can survive being frozen for thousands of years in permafrost.",
-    "The word virus comes from a Latin word meaning poison or slimy liquid."
+    "Viruses are the most abundant biological entities on Earth.",
+    "The human genome contains nearly 100,000 pieces of DNA from ancient viruses.",
+    "Some viruses, like Phages, are used to treat bacterial infections.",
+    "The first virus ever discovered was the Tobacco Mosaic Virus in 1892.",
+    "Viruses come in various shapes: Helical, Icosahedral, Prolate, and Complex."
 ]
-
-random_fact = random.choice(facts)
-st.sidebar.info(random_fact)
+st.sidebar.info(random_fact := random.choice(facts))
