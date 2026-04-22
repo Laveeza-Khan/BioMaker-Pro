@@ -45,11 +45,15 @@ if virus_name:
             break
 
     if pdb_id:
+        if pdb_id:
         st.info(f"Showing PDB Structure: {pdb_id}")
         # Rendering the 3D model
         view = py3Dmol.view(query=f'pdb:{pdb_id}')
         view.setStyle({'cartoon': {'color': 'spectrum'}})
-        stmol.show2stmol(view, height=400)
+        view.zoomTo() # Yeh line structure ko screen ke beech mein le aayegi
+        
+        # Naya method jo error nahi dega
+        stmol.make_to_stmol(view, height=400)
     else:
         # Agar structure nahi mila toh error message
         st.error(f"Sorry! 3D structure for '{virus_name}' is not in our database yet.")
