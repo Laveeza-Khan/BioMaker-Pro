@@ -3,7 +3,7 @@ import wikipedia
 import stmol
 import py3Dmol
 
-# 1. PDB Mapping Dictionary
+# 1. PDB Mapping
 pdb_dict = {
     "Polio": "1PIV",
     "Zika": "5IRE",
@@ -11,28 +11,26 @@ pdb_dict = {
     "Ebola": "4IDB",
     "Rabies": "6V5B",
     "Influenza": "1RVX",
-    "Hepatitis B": "2I6Z",
+    "Hepatitis": "2I6Z",
     "Adenovirus": "6CGV",
-    "Bacteriophage": "1X9B",
     "HIV": "1HVI"
 }
 
 st.title("🧬 BioMaker-Pro 2.0")
-st.markdown("Developed by Laveeza Khan | Biotech Student @ KU")
+st.markdown("Developed by Laveeza Khan | Biotech @ KU")
 
-# User Input
-virus_name = st.text_input("Enter Virus Name (e.g. Polio, Ebola, Zika):", "Polio")
+virus_name = st.text_input("Enter Virus Name:", "Polio")
 
 if virus_name:
-    # 2. Information from Wikipedia
+    # Wikipedia Info
     try:
         summary = wikipedia.summary(f"{virus_name} virus", sentences=3)
         st.subheader(f"About {virus_name}")
         st.write(summary)
     except:
-        st.warning("Could not fetch details from Wikipedia.")
+        st.write("Information fetching...")
 
-    # 3. 3D Visualization Logic
+    # 3D Structure
     st.subheader("3D Molecular Structure")
     
     pdb_id = None
@@ -42,11 +40,11 @@ if virus_name:
             break
 
     if pdb_id:
-        st.info(f"Showing PDB Structure: {pdb_id}")
+        st.info(f"PDB ID: {pdb_id}")
         view = py3Dmol.view(query=f'pdb:{pdb_id}')
         view.setStyle({'cartoon': {'color': 'spectrum'}})
         view.zoomTo()
-        stmol.make_to_stmol(view, height=400)
+        # Sab se stable function use kar rahe hain
+        stmol.show2stmol(view, height=400)
     else:
-        st.error(f"Sorry! 3D structure for '{virus_name}' is not in our database.")
-        st.info("Try: Polio, Zika, or Ebola.")
+        st.warning("Structure not in list, try Polio or Zika.")
