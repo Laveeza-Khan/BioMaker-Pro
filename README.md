@@ -1,19 +1,21 @@
-# 🧬 BioMaker-Pro: Interactive Virus Visualizer
+# 🧬 BioMaker-Pro: Viral Encyclopedia & Biosafety Guide
 
-Welcome to **BioMaker-Pro**! This is an AI-powered biotechnology tool designed to help students and researchers explore viral structures in 3D. 
+**BioMaker-Pro** is a comprehensive digital encyclopedia designed for biotechnology students and researchers to quickly access viral clinical data and biosafety protocols.
 
-### 🌟 Why I built this?
-As a Biotechnology student at KU, I wanted to move beyond textbooks. This tool bridges the gap between laboratory research and computational biology, making virus visualization accessible to everyone.
-
-### ✨ Features
-- **3D Molecular Viewing:** Interact with viral proteins using `stmol` and `py3Dmol`.
-- **Real-time Data:** Fetches biological information directly via the Wikipedia API.
-- **Academic Integration:** Focuses on key viruses like Polio, SARS-CoV-2, and more.
+### 🌟 New Features
+- **Extended Viral Database:** Detailed profiles for Polio, Zika, SARS-CoV-2, Ebola, Bacteriophages (Lambda/T4), Dengue, and more.
+- **Clinical Insights:** Instant access to symptoms, routes of entry, and biological targets.
+- **Biosafety Levels (BSL):** Integrated BSL-1 to BSL-4 classification for safe laboratory handling.
+- **Dynamic Facts:** Real-time viral facts fetched for continuous learning.
 
 ### 🛠️ Tech Stack
 - **Language:** Python
 - **Framework:** Streamlit
-- **Biological Data:** PDB (Protein Data Bank)
+- **Data Source:** Wikipedia API & Internal Clinical Database
+
+### 🚀 How to use
+Simply enter the name of a virus in the search bar to get an instant biological overview and safety profile.
 
 ---
-*Note: This project is currently in its learning & development phase. More updates coming soon!*
+*Developed by Laveeza Khan | Biotechnology Student*
+![Visitors](https://api.visitorbadge.io/api/visitors?path=Laveeza-Khan/BioMaker-Pro&label=TOTAL%20VIEWS&countColor=%23263159)
