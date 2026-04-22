@@ -1,8 +1,8 @@
-import random
 import streamlit as st
 import wikipedia
+import random
 
-# Extended Dictionary: Yahan humne mazeed viruses add kar diye hain
+# Extended Dictionary: Viruses data without emojis
 virus_data = {
     "Polio": {
         "Symptoms": "Fever, sore throat, vomiting, fatigue, stiffness in back/neck.",
@@ -30,10 +30,10 @@ virus_data = {
         "Route": "Direct contact with infected body fluids.",
         "Target": "Immune cells and blood vessel linings.",
         "BSL": "4",
-        "BSL_Info": "Maximum containment! Positive pressure 'Space Suits' required."
+        "BSL_Info": "Maximum containment! Positive pressure suits required."
     },
     "Bacteriophage": {
-        "Symptoms": "None (They only infect bacteria, not humans!).",
+        "Symptoms": "None (Infects bacteria only).",
         "Route": "Direct contact with host bacteria.",
         "Target": "Specific Bacterial cells (e.g., E. coli).",
         "BSL": "1",
@@ -47,7 +47,7 @@ virus_data = {
         "BSL_Info": "Basic lab safety; widely used in genetic research."
     },
     "Dengue": {
-        "Symptoms": "High fever, severe joint/muscle pain ('Breakbone fever'), rash.",
+        "Symptoms": "High fever, severe joint/muscle pain, rash.",
         "Route": "Aedes aegypti mosquito bite.",
         "Target": "Monocytes and macrophages.",
         "BSL": "2",
@@ -58,7 +58,7 @@ virus_data = {
         "Route": "Face-to-face contact, infected droplets.",
         "Target": "Skin cells and lymph nodes.",
         "BSL": "4",
-        "BSL_Info": "Only handled in extremely secure WHO-authorized labs (CDC/Russia)."
+        "BSL_Info": "Only handled in extremely secure WHO-authorized labs."
     },
     "HIV": {
         "Symptoms": "Flu-like symptoms initially, weight loss, weak immune system.",
@@ -76,22 +76,23 @@ virus_data = {
     }
 }
 
-st.set_page_config(page_title="BioMaker-Pro", page_icon=)
+st.set_page_config(page_title="BioMaker-Pro")
 
-st.title(" BioMaker-Pro: Viral Encyclopedia")
-st.markdown("**Developer:** Laveeza Khan")
+st.title("BioMaker-Pro: Viral Encyclopedia")
+st.markdown("Developer: Laveeza Khan")
 st.markdown("---")
+
 virus_name = st.text_input("Search Virus (e.g. Lambda, Ebola, Dengue, Polio):", "Polio")
 
 if virus_name:
     try:
         wiki_summary = wikipedia.summary(f"{virus_name} virus", sentences=3)
-        st.subheader(" Overview")
+        st.subheader("Overview")
         st.write(wiki_summary)
     except:
-        st.info("Fetching overview...")
+        st.info("Fetching overview from database...")
 
-    st.markdown("### 📊 Clinical & Biosafety Profile")
+    st.markdown("### Clinical and Biosafety Profile")
     
     found = False
     search_query = virus_name.lower()
@@ -99,35 +100,34 @@ if virus_name:
         if key.lower() in search_query:
             data = virus_data[key]
             
-            st.error(f" **Biosafety Level (BSL): {data['BSL']}**")
-            st.caption(f"Security: {data['BSL_Info']}")
+            st.error(f"Biosafety Level (BSL): {data['BSL']}")
+            st.caption(f"Security Requirement: {data['BSL_Info']}")
 
             col1, col2 = st.columns(2)
             with col1:
-                st.info(f"** Route of Entry:**\n{data['Route']}")
+                st.info(f"Route of Entry:\n{data['Route']}")
             with col2:
-                st.warning(f"** Target:**\n{data['Target']}")
+                st.warning(f"Target:\n{data['Target']}")
             
-            st.success(f"** Symptoms:**\n{data['Symptoms']}")
+            st.success(f"Symptoms:\n{data['Symptoms']}")
             found = True
             break
             
     if not found:
-        st.warning("Clinical details for this virus are not in the local database, but you can read the Wikipedia overview above!")
+        st.info("Additional clinical details for this virus are not in the local database.")
 
-# --- Fun Facts Section in Sidebar ---
-st. sidebar.markdown("---")
-st. sidebar.subheader("💡 Did You Know?")
+# Sidebar Facts without emojis
+st.sidebar.markdown("---")
+st.sidebar.subheader("Did You Know?")
 
 facts = [
-    "Bacteriophages are being researched as 'Phage Therapy' to kill antibiotic-resistant bacteria!",
-    "Viruses are not technically 'alive' because they cannot reproduce without a host cell.",
-    "The MimiVirus is so large that it was originally mistaken for a bacterium!",
-    "About 8% of human DNA actually comes from ancient viruses that infected our ancestors.",
+    "Bacteriophages are being researched as Phage Therapy to kill antibiotic-resistant bacteria.",
+    "Viruses are not technically alive because they cannot reproduce without a host cell.",
+    "The MimiVirus is so large that it was originally mistaken for a bacterium.",
+    "About 8 percent of human DNA actually comes from ancient viruses.",
     "Some viruses can survive being frozen for thousands of years in permafrost.",
-    "The word 'virus' comes from a Latin word meaning 'poison' or 'slimy liquid'."
+    "The word virus comes from a Latin word meaning poison or slimy liquid."
 ]
 
-# Randomly aik fact select karke dikhane ke liye
 random_fact = random.choice(facts)
 st.sidebar.info(random_fact)
