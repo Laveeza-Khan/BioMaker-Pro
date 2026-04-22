@@ -48,11 +48,9 @@ if virus_name:
                 # Improved Taxonomy Logic
                 family, genus = "Information in Article", "Information in Article"
                 
-                # Hardcoded cleanup for Rabies to ensure a perfect screenshot
                 if "rabies" in page_title.lower():
                     family, genus = "Rhabdoviridae", "Lyssavirus"
                 else:
-                    # General search logic for other viruses
                     for line in content_lower.split('\n')[:100]:
                         if "family" in line and ":" in line:
                             family = line.split(":")[1].strip().split(" ")[0].replace(".", "").replace(",", "")
@@ -89,17 +87,25 @@ if virus_name:
 
             with col3:
                 st.markdown("### Pathogenesis")
-                symp = "See overview"
+                symp = "Check Overview"
                 if "symptoms" in content_lower:
                     try:
-                        symp = content_lower.split("symptoms")[1].split(".")[0].replace("==", "").strip()
+                        # CLEANING LOGIC: '==' aur 'the first' ko skip karne ke liye
+                        raw_data = content_lower.split("symptoms")[1].split(". ")
+                        # Pehla valid sentence dhoondna
+                        for sentence in raw_data:
+                            clean = sentence.replace("==", "").replace("=", "").strip()
+                            if len(clean) > 15 and not clean.startswith("the first"):
+                                symp = clean
+                                break
                     except: pass
                 st.write(f"**Symptoms:** {symp.capitalize()}")
                 
                 trans = "Contact/Droplets"
                 if "transmission" in content_lower:
                     try:
-                        trans = content_lower.split("transmission")[1].split(".")[0].replace("==", "").strip()
+                        raw_trans = content_lower.split("transmission")[1].split(". ")[0]
+                        trans = raw_trans.replace("==", "").replace("=", "").strip()
                     except: pass
                 st.write(f"**Route:** {trans.capitalize()}")
             
@@ -111,7 +117,7 @@ if virus_name:
         st.markdown(f"🔗 [Manual Source](https://en.wikipedia.org/wiki/{virus_name.replace(' ', '_')}_virus)")
 
 # Sidebar
-st. sidebar.title("💡 Viral Facts")
+st.sidebar.title("💡 Viral Facts")
 facts = [
     "Viruses are classified into families based on genome type and structure.",
     "BSL-4 labs are used for viruses with no known vaccine or treatment.",
