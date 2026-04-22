@@ -2,60 +2,60 @@ import streamlit as st
 import wikipedia
 import random
 
-# --- Professional Styling (Your Palette) ---
+# --- Professional Dark Theme Styling ---
 st.set_page_config(page_title="BioMaker-Pro", layout="wide")
 
 st.markdown(f"""
     <style>
-    .stApp {{ background-color: #D5D3CC; }}
-    h1, h2, h3 {{ color: #19350C; font-family: 'Serif'; }}
-    .stTextInput > div > div > input {{ border: 2px solid #406768; border-radius: 8px; }}
-    .stInfo {{ background-color: #6FA9BB; color: #19350C; border: none; padding: 20px; border-radius: 10px; }}
-    .stWarning {{ background-color: #687D31; color: #ffffff; padding: 10px; border-radius: 5px; }}
-    .stSuccess {{ background-color: #406768; color: #ffffff; padding: 10px; border-radius: 5px; }}
+    .stApp {{ background-color: #233939; color: #D5D3CC; }}
+    h1, h2, h3 {{ color: #687D31; font-family: 'Serif'; }}
+    .stTextInput > div > div > input {{ background-color: #D5D3CC; color: #19350C; border: 2px solid #687D31; border-radius: 8px; }}
+    .stInfo {{ background-color: #6FA9BB; color: #19350C; border-radius: 10px; border: none; }}
+    .stWarning {{ background-color: #19350C; color: #D5D3CC; border: 1px solid #687D31; }}
+    .stSuccess {{ background-color: #406768; color: #ffffff; }}
+    .stError {{ background-color: #932a2a; color: #ffffff; font-weight: bold; }}
     </style>
     """, unsafe_allow_html=True)
 
-# Header
 st.title("BioMaker-Pro: Advanced Viral Taxonomy")
 st.markdown("**Developer:** Laveeza Khan")
 st.markdown("---")
 
-# User Input
-virus_name = st.text_input("Search Virus (e.g. Rabies, Ebola, Polio, Lambda):", "Polio")
+virus_name = st.text_input("Search Virus (e.g. Rabies, Ebola, Polio, Bacteriophage):", "Rabies")
 
 if virus_name:
     try:
-        # Wikipedia Search
         search_results = wikipedia.search(f"{virus_name} virus")
         if not search_results:
-            st.error("No specific virus found. Try checking the spelling.")
+            st.error("Virus not found in database. Check spelling.")
         else:
             page_title = search_results[0]
             page = wikipedia.page(page_title)
             summary = wikipedia.summary(page_title, sentences=3)
             content_lower = page.content.lower()
             
-            # Overview
+            # 1. Overview
             st.subheader("General Overview")
             st.info(summary)
-            
             st.markdown("---")
             
-            # Taxonomy & Clinical Profile
-            st.subheader("Taxonomy and Biological Profile")
+            # 2. Taxonomy & Biosafety Profile
+            st.subheader("Biological Classification & Clinical Profile")
             col1, col2, col3 = st.columns(3)
             
             with col1:
-                st.markdown("### Classification")
-                family = "Not specified"
-                genus = "Not specified"
+                st.markdown("### Taxonomy")
+                # Advanced Taxonomy Extraction logic
+                family, genus = "Unknown", "Unknown"
+                search_space = content_lower[:5000]
                 
-                # Logic to extract Family and Genus
-                lines = content_lower.split('\n')
-                for line in lines[:60]:
-                    if "family:" in line: family = line.split("family:")[1].strip()
-                    if "genus:" in line: genus = line.split("genus:")[1].strip()
+                if "family" in search_space:
+                    try: family = search_space.split("family")[1].split("\n")[0].replace(":", "").strip().split(" ")[0]
+                    except: family = "Data in article"
+                
+                if "genus" in search_space:
+                    try: genus = search_space.split("genus")[1].split("\n")[0].replace(":", "").strip().split(" ")[0]
+                    except: genus = "Data in article"
                 
                 st.write(f"**Family:** {family.capitalize()}")
                 st.write(f"**Genus:** {genus.capitalize()}")
@@ -63,54 +63,54 @@ if virus_name:
 
             with col2:
                 st.markdown("### Clinical Safety")
-                # BSL Logic
-                danger_score = any(word in content_lower[:3000] for word in ["fatal", "mortality", "ebola", "sars", "mers", "outbreak"])
-                bsl = "3 or 4" if danger_score else "2"
+                # BSL Logic (Prioritized)
+                bsl_4_list = ["ebola", "marburg", "lassa", "smallpox", "crimean-congo"]
+                bsl_3_list = ["sars", "mers", "covid", "hiv", "rabies", "hantavirus"]
+                
+                name_low = page_title.lower()
+                if any(v in name_low for v in bsl_4_list): bsl = "4"
+                elif any(v in name_low for v in bsl_3_list): bsl = "3"
+                else: bsl = "2"
+                
                 st.error(f"Biosafety Level (BSL): {bsl}")
                 
-                # --- FIXED ZOONOTIC LOGIC ---
-                # 1. Known Human-only viruses (Blacklist for Zoonotic)
-                human_only = ["polio", "smallpox", "measles", "rubella", "hiv"]
-                
-                # 2. Indicators for Zoonosis
+                # Zoonotic Logic
+                human_only = ["polio", "smallpox", "measles", "hiv", "rubella"]
                 zoonotic_indicators = ["zoonosis", "zoonotic", "animal-to-human", "spillover", "natural reservoir"]
                 
                 is_zoonotic = any(word in content_lower[:4000] for word in zoonotic_indicators)
-                is_human_only = any(h in page_title.lower() for h in human_only)
+                is_human_specific = any(h in name_low for h in human_only)
 
-                if is_zoonotic and not is_human_only:
+                if is_zoonotic and not is_human_specific:
                     st.warning("Type: Zoonotic Virus")
-                    st.caption("This virus can transmit from animals to humans.")
                 else:
-                    st.success("Type: Human-Specific / Non-Zoonotic")
-                    st.caption("This virus primarily infects humans or specific hosts.")
+                    st.success("Type: Human-Specific")
 
             with col3:
-                st.markdown("### Transmission")
-                # Clinical Details extraction
-                symp_text = "Refer to overview"
+                st.markdown("### Pathogenesis")
+                symp = "See overview"
                 if "symptoms" in content_lower:
-                    symp_text = content_lower.split("symptoms")[1].split(".")[0]
-                st.write(f"**Symptoms:** {symp_text.capitalize()}")
+                    symp = content_lower.split("symptoms")[1].split(".")[0]
+                st.write(f"**Symptoms:** {symp.capitalize()}")
                 
-                trans_text = "Direct contact / Droplets"
+                trans = "Contact/Droplets"
                 if "transmission" in content_lower:
-                    trans_text = content_lower.split("transmission")[1].split(".")[0]
-                st.write(f"**Route:** {trans_text.capitalize()}")
+                    trans = content_lower.split("transmission")[1].split(".")[0]
+                st.write(f"**Route:** {trans.capitalize()}")
             
             st.markdown("---")
-            st.markdown(f"🔗 **Research Source:** [Wikipedia Article]({page.url})")
+            st.markdown(f"🔗 **Detailed Research:** [Wikipedia Source]({page.url})")
 
     except Exception:
-        st.warning("Automated extraction limit reached. Please check the source link.")
-        st.markdown(f"🔗 [Search for {virus_name} Source](https://en.wikipedia.org/wiki/{virus_name.replace(' ', '_')}_virus)")
+        st.warning("Automated summary generated. Check the link for full taxonomy.")
+        st.markdown(f"🔗 [Manual Source](https://en.wikipedia.org/wiki/{virus_name.replace(' ', '_')}_virus)")
 
 # Sidebar
 st.sidebar.title("💡 Viral Facts")
 facts = [
-    "Zoonotic viruses like Rabies jump from animals to humans.",
-    "Bacteriophages are viruses that eat bacteria—very useful in biotech!",
-    "The 1918 Flu pandemic changed the way we study virology.",
-    "Viruses are genetic material wrapped in a protein coat (capsid)."
+    "Viruses are classified into families based on genome type and structure.",
+    "BSL-4 labs are used for viruses with no known vaccine or treatment.",
+    "Zoonotic spillover is a major cause of emerging infectious diseases.",
+    "Taxonomy helps in understanding viral evolution and host range."
 ]
 st.sidebar.info(random.choice(facts))
