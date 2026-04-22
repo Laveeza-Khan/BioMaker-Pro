@@ -1,49 +1,77 @@
 import streamlit as st
 import wikipedia
 
-# Dictionary for manual data: Symptoms, Route, Target, and BSL Levels
+# Extended Dictionary: Yahan humne mazeed viruses add kar diye hain
 virus_data = {
     "Polio": {
-        "Symptoms": "Fever, sore throat, headache, vomiting, fatigue, stiffness in the back and neck.",
-        "Route": "Fecal-oral route (contaminated water or food).",
-        "Target": "Central Nervous System (Motor neurons).",
+        "Symptoms": "Fever, sore throat, vomiting, fatigue, stiffness in back/neck.",
+        "Route": "Fecal-oral route (contaminated water/food).",
+        "Target": "Motor neurons in the Central Nervous System.",
         "BSL": "2",
-        "BSL_Info": "Handle with standard microbiological practices and protective clothing."
+        "BSL_Info": "Standard lab safety with protective gear."
     },
     "Zika": {
-        "Symptoms": "Fever, rash, conjunctivitis, muscle and joint pain, malaise, headache.",
-        "Route": "Aedes mosquito bite, sexual transmission, blood transfusion.",
+        "Symptoms": "Fever, rash, joint pain, red eyes.",
+        "Route": "Aedes mosquito bite, sexual transmission.",
         "Target": "Neural progenitor cells.",
         "BSL": "2",
-        "BSL_Info": "Requires Biosafety Level 2 facilities and containment."
+        "BSL_Info": "Standard containment; special care for pregnant staff."
     },
     "SARS-CoV-2": {
-        "Symptoms": "Fever, cough, tiredness, loss of taste or smell, difficulty breathing.",
-        "Route": "Respiratory droplets and aerosols.",
-        "Target": "Respiratory system (ACE2 receptors).",
+        "Symptoms": "Fever, cough, loss of taste/smell, breathing issues.",
+        "Route": "Respiratory droplets (coughing/sneezing).",
+        "Target": "Respiratory system (Lungs).",
         "BSL": "3",
-        "BSL_Info": "Requires specialized ventilation systems and strictly controlled access."
+        "BSL_Info": "High-level containment with specialized ventilation (Negative pressure)."
     },
     "Ebola": {
-        "Symptoms": "Fever, severe headache, muscle pain, weakness, fatigue, diarrhea, unexplained bleeding.",
-        "Route": "Direct contact with infected blood or body fluids.",
-        "Target": "Immune cells and endothelial cells.",
+        "Symptoms": "Internal/external bleeding, fever, severe headache.",
+        "Route": "Direct contact with infected body fluids.",
+        "Target": "Immune cells and blood vessel linings.",
         "BSL": "4",
-        "BSL_Info": "Maximum containment! Requires positive pressure suits and dedicated air supply."
+        "BSL_Info": "Maximum containment! Positive pressure 'Space Suits' required."
+    },
+    "Bacteriophage": {
+        "Symptoms": "None (They only infect bacteria, not humans!).",
+        "Route": "Direct contact with host bacteria.",
+        "Target": "Specific Bacterial cells (e.g., E. coli).",
+        "BSL": "1",
+        "BSL_Info": "Generally safe; handled in basic microbiology labs."
+    },
+    "Lambda": {
+        "Symptoms": "Infects bacteria (non-pathogenic to humans).",
+        "Route": "Infection of E. coli through the LamB receptor.",
+        "Target": "E. coli bacteria (Lysogenic/Lytic cycles).",
+        "BSL": "1",
+        "BSL_Info": "Basic lab safety; widely used in genetic research."
+    },
+    "Dengue": {
+        "Symptoms": "High fever, severe joint/muscle pain ('Breakbone fever'), rash.",
+        "Route": "Aedes aegypti mosquito bite.",
+        "Target": "Monocytes and macrophages.",
+        "BSL": "2",
+        "BSL_Info": "Standard BSL-2 practices; avoid needle sticks."
+    },
+    "Smallpox": {
+        "Symptoms": "High fever, fatigue, and characteristic skin rashes (pustules).",
+        "Route": "Face-to-face contact, infected droplets.",
+        "Target": "Skin cells and lymph nodes.",
+        "BSL": "4",
+        "BSL_Info": "Only handled in extremely secure WHO-authorized labs (CDC/Russia)."
     },
     "HIV": {
-        "Symptoms": "Flu-like symptoms, fever, sore throat, and fatigue.",
-        "Route": "Blood-to-blood contact, sexual contact.",
-        "Target": "CD4+ T cells (Immune system).",
+        "Symptoms": "Flu-like symptoms initially, weight loss, weak immune system.",
+        "Route": "Blood or sexual contact.",
+        "Target": "CD4+ T cells.",
         "BSL": "2/3",
-        "BSL_Info": "BSL-2 for clinical work; BSL-3 for large-scale production or research."
+        "BSL_Info": "BSL-2 for tests; BSL-3 for research/culture."
     },
-    "Rabies": {
-        "Symptoms": "Fever, headache, excess salivation, muscle spasms, paralysis, and mental confusion.",
-        "Route": "Saliva of infected animals (usually through a bite).",
-        "Target": "Central Nervous System.",
-        "BSL": "2",
-        "BSL_Info": "Requires BSL-2 practices; vaccination is highly recommended for lab workers."
+    "MERS": {
+        "Symptoms": "Severe respiratory illness, fever, cough, shortness of breath.",
+        "Route": "Zoonotic (from camels) and respiratory droplets.",
+        "Target": "Lower respiratory tract.",
+        "BSL": "3",
+        "BSL_Info": "Requires BSL-3 containment and specialized PPE."
     }
 }
 
@@ -53,43 +81,38 @@ st.title("🧬 BioMaker-Pro: Viral Encyclopedia")
 st.markdown(f"**Developer:** Laveeza Khan | 3rd Year Biotech Student @ KU")
 st.markdown("---")
 
-# User Input
-virus_name = st.text_input("Enter Virus Name (e.g. Polio, Zika, Ebola, SARS-CoV-2):", "Polio")
+virus_name = st.text_input("Search Virus (e.g. Lambda, Ebola, Dengue, Polio):", "Polio")
 
 if virus_name:
-    # 1. Fetching Summary from Wikipedia
     try:
         wiki_summary = wikipedia.summary(f"{virus_name} virus", sentences=3)
         st.subheader("📌 Overview")
         st.write(wiki_summary)
     except:
-        st.warning("Fetching data...")
+        st.info("Fetching overview...")
 
-    # 2. Clinical & Biosafety Details
     st.markdown("### 📊 Clinical & Biosafety Profile")
     
     found = False
+    search_query = virus_name.lower()
     for key in virus_data:
-        if key.lower() in virus_name.lower():
+        if key.lower() in search_query:
             data = virus_data[key]
             
-            # BSL Level Highlight (Aik baray box mein)
             st.error(f"⚠️ **Biosafety Level (BSL): {data['BSL']}**")
-            st.caption(f"Security Requirement: {data['BSL_Info']}")
+            st.caption(f"Security: {data['BSL_Info']}")
 
-            # Creating nice boxes for clinical info
             col1, col2 = st.columns(2)
             with col1:
                 st.info(f"**🚪 Route of Entry:**\n{data['Route']}")
             with col2:
-                st.warning(f"**🎯 Target Organ:**\n{data['Target']}")
+                st.warning(f"**🎯 Target:**\n{data['Target']}")
             
-            st.success(f"**🤒 Common Symptoms:**\n{data['Symptoms']}")
+            st.success(f"**🤒 Symptoms:**\n{data['Symptoms']}")
             found = True
             break
             
     if not found:
-        st.info("Additional clinical and BSL data for this specific virus is being updated.")
+        st.warning("Clinical details for this virus are not in the local database, but you can read the Wikipedia overview above!")
 
-st.sidebar.markdown("---")
-st.sidebar.info("💡 **Learning Tip:** BSL-4 is for the most dangerous pathogens with no vaccines, like Ebola.")
+st.sidebar.info("💡 **Fun Fact:** Bacteriophages are being researched as 'Phage Therapy' to kill antibiotic-resistant bacteria!")
