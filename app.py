@@ -2,49 +2,31 @@ import streamlit as st
 import wikipedia
 import random
 
-# --- Professional Styling using Your Palette ---
+# --- Professional Styling (Your Palette) ---
 st.set_page_config(page_title="BioMaker-Pro", layout="wide")
 
 st.markdown(f"""
     <style>
-    /* Main Background: Light Gray from palette */
-    .stApp {{
-        background-color: #D5D3CC; 
-    }}
-    /* Main Title and Headers: Phthalo Green */
-    h1, h2, h3 {{
-        color: #19350C;
-        font-family: 'Serif';
-    }}
-    /* Search Bar and Boxes: Deep Space Sparkle & Moonstone Blue */
-    .stTextInput > div > div > input {{
-        border: 2px solid #406768;
-        border-radius: 8px;
-    }}
-    /* Custom Info Boxes */
-    .stInfo {{
-        background-color: #6FA9BB; /* Moonstone Blue */
-        color: #19350C;
-        border: none;
-    }}
-    .stWarning {{
-        background-color: #687D31; /* Mustard Green */
-        color: #ffffff;
-    }}
+    .stApp {{ background-color: #D5D3CC; }}
+    h1, h2, h3 {{ color: #19350C; font-family: 'Serif'; }}
+    .stTextInput > div > div > input {{ border: 2px solid #406768; border-radius: 8px; }}
+    .stInfo {{ background-color: #6FA9BB; color: #19350C; border: none; padding: 20px; border-radius: 10px; }}
+    .stWarning {{ background-color: #687D31; color: #ffffff; padding: 10px; border-radius: 5px; }}
+    .stSuccess {{ background-color: #406768; color: #ffffff; padding: 10px; border-radius: 5px; }}
     </style>
     """, unsafe_allow_html=True)
 
-# --- Header Section ---
+# Header
 st.title("BioMaker-Pro: Advanced Viral Taxonomy")
 st.markdown("**Developer:** Laveeza Khan")
 st.markdown("---")
 
-# --- Search Section ---
-virus_name = st.text_input("Search Virus (e.g. Rabies, Ebola, MERS, T4 Phage):", "Rabies")
+# User Input
+virus_name = st.text_input("Search Virus (e.g. Rabies, Ebola, Polio, Lambda):", "Polio")
 
 if virus_name:
     try:
-        # Wikipedia Search Logic
+        # Wikipedia Search
         search_results = wikipedia.search(f"{virus_name} virus")
         if not search_results:
             st.error("No specific virus found. Try checking the spelling.")
@@ -54,69 +36,81 @@ if virus_name:
             summary = wikipedia.summary(page_title, sentences=3)
             content_lower = page.content.lower()
             
-            # 1. Overview Section
+            # Overview
             st.subheader("General Overview")
             st.info(summary)
             
             st.markdown("---")
             
-            # 2. Advanced Classification & Profile
+            # Taxonomy & Clinical Profile
             st.subheader("Taxonomy and Biological Profile")
             col1, col2, col3 = st.columns(3)
             
             with col1:
                 st.markdown("### Classification")
-                # Extracting Family, Genus, Species
-                family = "Not found"
-                genus = "Not found"
-                for line in content_lower.split("\n"):
-                    if "family:" in line or "family " in line: family = line
-                    if "genus:" in line or "genus " in line: genus = line
+                family = "Not specified"
+                genus = "Not specified"
                 
-                st.write(f"**Family:** {family.replace('family', '').strip().capitalize()}")
-                st.write(f"**Genus:** {genus.replace('genus', '').strip().capitalize()}")
+                # Logic to extract Family and Genus
+                lines = content_lower.split('\n')
+                for line in lines[:60]:
+                    if "family:" in line: family = line.split("family:")[1].strip()
+                    if "genus:" in line: genus = line.split("genus:")[1].strip()
+                
+                st.write(f"**Family:** {family.capitalize()}")
+                st.write(f"**Genus:** {genus.capitalize()}")
                 st.write(f"**Species:** {page_title}")
 
             with col2:
                 st.markdown("### Clinical Safety")
-                # BSL Estimation
-                danger_score = any(word in content_lower for word in ["fatal", "mortality", "high risk", "outbreak", "pandemic"])
+                # BSL Logic
+                danger_score = any(word in content_lower[:3000] for word in ["fatal", "mortality", "ebola", "sars", "mers", "outbreak"])
                 bsl = "3 or 4" if danger_score else "2"
                 st.error(f"Biosafety Level (BSL): {bsl}")
                 
-                # Zoonotic Status Logic
-                zoonotic_words = ["animal", "bird", "bat", "camel", "pig", "monkey", "zoonotic", "bite"]
-                is_zoonotic = any(word in content_lower for word in zoonotic_words)
-                if is_zoonotic:
-                    st.warning("Type: Zoonotic Virus (Transmitted from animals)")
+                # --- FIXED ZOONOTIC LOGIC ---
+                # 1. Known Human-only viruses (Blacklist for Zoonotic)
+                human_only = ["polio", "smallpox", "measles", "rubella", "hiv"]
+                
+                # 2. Indicators for Zoonosis
+                zoonotic_indicators = ["zoonosis", "zoonotic", "animal-to-human", "spillover", "natural reservoir"]
+                
+                is_zoonotic = any(word in content_lower[:4000] for word in zoonotic_indicators)
+                is_human_only = any(h in page_title.lower() for h in human_only)
+
+                if is_zoonotic and not is_human_only:
+                    st.warning("Type: Zoonotic Virus")
+                    st.caption("This virus can transmit from animals to humans.")
                 else:
-                    st.success("Type: Human-specific or Non-zoonotic")
+                    st.success("Type: Human-Specific / Non-Zoonotic")
+                    st.caption("This virus primarily infects humans or specific hosts.")
 
             with col3:
                 st.markdown("### Transmission")
-                # Symptoms and Entry
+                # Clinical Details extraction
+                symp_text = "Refer to overview"
                 if "symptoms" in content_lower:
-                    symp = content_lower.split("symptoms")[1].split(".")[0]
-                    st.write(f"**Symptoms:** {symp.capitalize()}.")
+                    symp_text = content_lower.split("symptoms")[1].split(".")[0]
+                st.write(f"**Symptoms:** {symp_text.capitalize()}")
                 
+                trans_text = "Direct contact / Droplets"
                 if "transmission" in content_lower:
-                    trans = content_lower.split("transmission")[1].split(".")[0]
-                    st.write(f"**Route:** {trans.capitalize()}.")
+                    trans_text = content_lower.split("transmission")[1].split(".")[0]
+                st.write(f"**Route:** {trans_text.capitalize()}")
             
             st.markdown("---")
-            st.markdown(f"🔗 **Deep Research Link:** [Read more about {page_title} on Wikipedia]({page.url})")
+            st.markdown(f"🔗 **Research Source:** [Wikipedia Article]({page.url})")
 
     except Exception:
-        st.warning("Direct data extraction failed. Please use the link below for full research.")
+        st.warning("Automated extraction limit reached. Please check the source link.")
         st.markdown(f"🔗 [Search for {virus_name} Source](https://en.wikipedia.org/wiki/{virus_name.replace(' ', '_')}_virus)")
 
-# --- Sidebar Fun Facts ---
+# Sidebar
 st.sidebar.title("💡 Viral Facts")
 facts = [
-    "Viruses are not technically 'alive' but carry genetic blueprints.",
-    "Bacteriophages look like tiny lunar landers and only kill bacteria.",
-    "The world's smallest virus is the Porcine Circovirus.",
-    "The 1918 Flu pandemic was one of the deadliest in human history.",
-    "Zoonotic viruses jump from animals to humans through close contact."
+    "Zoonotic viruses like Rabies jump from animals to humans.",
+    "Bacteriophages are viruses that eat bacteria—very useful in biotech!",
+    "The 1918 Flu pandemic changed the way we study virology.",
+    "Viruses are genetic material wrapped in a protein coat (capsid)."
 ]
 st.sidebar.info(random.choice(facts))
