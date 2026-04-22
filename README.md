@@ -17,7 +17,7 @@ A professional biotechnology tool to explore viral taxonomy, clinical symptoms, 
 - **Framework:** Streamlit
 - **Data Source:** Wikipedia API & Internal Clinical Database
 
-### 🚀 How to use
+###  How to use
 Simply enter the name of a virus in the search bar to get an instant biological overview and safety profile.
 
 ---
