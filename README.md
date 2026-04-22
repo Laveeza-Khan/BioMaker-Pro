@@ -22,4 +22,3 @@ Simply enter the name of a virus in the search bar to get an instant biological 
 
 ---
 *Developed by Laveeza Khan | Biotechnology Student*
-![Visitors](https://api.visitorbadge.io/api/visitors?path=Laveeza-Khan/BioMaker-Pro&label=TOTAL%20VIEWS&countColor=%23263159)
