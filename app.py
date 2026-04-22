@@ -2,103 +2,121 @@ import streamlit as st
 import wikipedia
 import random
 
-# --- Professional Styling & Theme ---
+# --- Professional Styling using Your Palette ---
 st.set_page_config(page_title="BioMaker-Pro", layout="wide")
 
-# Custom CSS for Background and Professional Look
-st.markdown("""
+st.markdown(f"""
     <style>
-    .stApp {
-        background-color: #e5e7eb; /* Professional Light Gray-Blue */
-    }
-    .main-box {
-        background-color: #ffffff;
-        padding: 20px;
-        border-radius: 10px;
-        box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
-    }
-    h1 {
-        color: #1e3a8a; /* Dark Blue */
-    }
-    .stTextInput > div > div > input {
-        border: 2px solid #1e3a8a;
-    }
+    /* Main Background: Light Gray from palette */
+    .stApp {{
+        background-color: #D5D3CC; 
+    }}
+    /* Main Title and Headers: Phthalo Green */
+    h1, h2, h3 {{
+        color: #19350C;
+        font-family: 'Serif';
+    }}
+    /* Search Bar and Boxes: Deep Space Sparkle & Moonstone Blue */
+    .stTextInput > div > div > input {{
+        border: 2px solid #406768;
+        border-radius: 8px;
+    }}
+    /* Custom Info Boxes */
+    .stInfo {{
+        background-color: #6FA9BB; /* Moonstone Blue */
+        color: #19350C;
+        border: none;
+    }}
+    .stWarning {{
+        background-color: #687D31; /* Mustard Green */
+        color: #ffffff;
+    }}
     </style>
     """, unsafe_allow_html=True)
 
 # --- Header Section ---
-st.title("BioMaker-Pro: Professional Viral Encyclopedia")
-st.markdown("Developer: Laveeza Khan")
+st.title("BioMaker-Pro: Advanced Viral Taxonomy")
+st.markdown("**Developer:** Laveeza Khan")
 st.markdown("---")
 
 # --- Search Section ---
-virus_name = st.text_input("Search any Virus (e.g. Rabies, Influenza, HPV, Dengue):", "Rabies")
+virus_name = st.text_input("Search Virus (e.g. Rabies, Ebola, MERS, T4 Phage):", "Rabies")
 
 if virus_name:
     try:
-        # Search and fetch page
+        # Wikipedia Search Logic
         search_results = wikipedia.search(f"{virus_name} virus")
         if not search_results:
-            st.error("No results found. Please check the spelling.")
+            st.error("No specific virus found. Try checking the spelling.")
         else:
-            # Picking the best match
             page_title = search_results[0]
             page = wikipedia.page(page_title)
             summary = wikipedia.summary(page_title, sentences=3)
+            content_lower = page.content.lower()
             
             # 1. Overview Section
-            st.subheader("Overview")
+            st.subheader("General Overview")
             st.info(summary)
             
             st.markdown("---")
             
-            # 2. Automated Profile
-            st.subheader("Biological and Clinical Profile")
-            col1, col2 = st.columns(2)
-            
-            content_lower = page.content.lower()
+            # 2. Advanced Classification & Profile
+            st.subheader("Taxonomy and Biological Profile")
+            col1, col2, col3 = st.columns(3)
             
             with col1:
                 st.markdown("### Classification")
-                # Smart family detection
-                if "family" in content_lower:
-                    family_info = content_lower.split("family")[1].split(".")[0].split("\n")[0]
-                    st.write(f"**Family:** {family_info.capitalize()}")
-                else:
-                    st.write("**Family:** Refer to Wikipedia for detailed taxonomy.")
+                # Extracting Family, Genus, Species
+                family = "Not found"
+                genus = "Not found"
+                for line in content_lower.split("\n"):
+                    if "family:" in line or "family " in line: family = line
+                    if "genus:" in line or "genus " in line: genus = line
                 
-                # BSL Logic
-                danger_score = any(word in content_lower for word in ["fatal", "mortality", "high risk", "outbreak", "pandemic"])
-                bsl = "3" if danger_score else "2"
-                st.markdown(f"**Estimated Biosafety Level (BSL):** {bsl}")
-            
+                st.write(f"**Family:** {family.replace('family', '').strip().capitalize()}")
+                st.write(f"**Genus:** {genus.replace('genus', '').strip().capitalize()}")
+                st.write(f"**Species:** {page_title}")
+
             with col2:
-                st.markdown("### Clinical Features")
-                # Symptoms detection
+                st.markdown("### Clinical Safety")
+                # BSL Estimation
+                danger_score = any(word in content_lower for word in ["fatal", "mortality", "high risk", "outbreak", "pandemic"])
+                bsl = "3 or 4" if danger_score else "2"
+                st.error(f"Biosafety Level (BSL): {bsl}")
+                
+                # Zoonotic Status Logic
+                zoonotic_words = ["animal", "bird", "bat", "camel", "pig", "monkey", "zoonotic", "bite"]
+                is_zoonotic = any(word in content_lower for word in zoonotic_words)
+                if is_zoonotic:
+                    st.warning("Type: Zoonotic Virus (Transmitted from animals)")
+                else:
+                    st.success("Type: Human-specific or Non-zoonotic")
+
+            with col3:
+                st.markdown("### Transmission")
+                # Symptoms and Entry
                 if "symptoms" in content_lower:
                     symp = content_lower.split("symptoms")[1].split(".")[0]
                     st.write(f"**Symptoms:** {symp.capitalize()}.")
-                else:
-                    st.write("**Symptoms:** Fever, malaise, and specific viral symptoms.")
                 
-                # Transmission
                 if "transmission" in content_lower:
                     trans = content_lower.split("transmission")[1].split(".")[0]
-                    st.write(f"**Transmission:** {trans.capitalize()}.")
-                else:
-                    st.write("**Transmission:** Direct contact or respiratory droplets.")
+                    st.write(f"**Route:** {trans.capitalize()}.")
+            
+            st.markdown("---")
+            st.markdown(f"🔗 **Deep Research Link:** [Read more about {page_title} on Wikipedia]({page.url})")
 
     except Exception:
-        st.warning("Specific clinical details are being synthesized from the global database. Please refer to the Overview above.")
+        st.warning("Direct data extraction failed. Please use the link below for full research.")
+        st.markdown(f"🔗 [Search for {virus_name} Source](https://en.wikipedia.org/wiki/{virus_name.replace(' ', '_')}_virus)")
 
-# --- Sidebar Knowledge Base ---
-st.sidebar.title("Viral Knowledge")
+# --- Sidebar Fun Facts ---
+st.sidebar.title("💡 Viral Facts")
 facts = [
-    "Viruses can infect all types of life forms, from animals and plants to microorganisms.",
-    "The study of viruses is known as virology, a subspecialty of microbiology.",
-    "Most viruses are too small to be seen directly with an optical microscope.",
-    "Viral populations can evolve rapidly through mutation and natural selection.",
-    "Vaccination is the most effective way to prevent many viral infections."
+    "Viruses are not technically 'alive' but carry genetic blueprints.",
+    "Bacteriophages look like tiny lunar landers and only kill bacteria.",
+    "The world's smallest virus is the Porcine Circovirus.",
+    "The 1918 Flu pandemic was one of the deadliest in human history.",
+    "Zoonotic viruses jump from animals to humans through close contact."
 ]
-st.sidebar.markdown("---")
-st.sidebar.write(random.choice(facts))
+st.sidebar.info(random.choice(facts))
