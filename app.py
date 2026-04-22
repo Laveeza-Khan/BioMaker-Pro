@@ -76,9 +76,9 @@ virus_data = {
     }
 }
 
-st.set_page_config(page_title="BioMaker-Pro", page_icon="🧬")
+st.set_page_config(page_title="BioMaker-Pro", page_icon=)
 
-st.title("🧬 BioMaker-Pro: Viral Encyclopedia")
+st.title(" BioMaker-Pro: Viral Encyclopedia")
 st.markdown("**Developer:** Laveeza Khan")
 st.markdown("---")
 virus_name = st.text_input("Search Virus (e.g. Lambda, Ebola, Dengue, Polio):", "Polio")
@@ -86,7 +86,7 @@ virus_name = st.text_input("Search Virus (e.g. Lambda, Ebola, Dengue, Polio):", 
 if virus_name:
     try:
         wiki_summary = wikipedia.summary(f"{virus_name} virus", sentences=3)
-        st.subheader("📌 Overview")
+        st.subheader(" Overview")
         st.write(wiki_summary)
     except:
         st.info("Fetching overview...")
@@ -99,16 +99,16 @@ if virus_name:
         if key.lower() in search_query:
             data = virus_data[key]
             
-            st.error(f"⚠️ **Biosafety Level (BSL): {data['BSL']}**")
+            st.error(f" **Biosafety Level (BSL): {data['BSL']}**")
             st.caption(f"Security: {data['BSL_Info']}")
 
             col1, col2 = st.columns(2)
             with col1:
-                st.info(f"**🚪 Route of Entry:**\n{data['Route']}")
+                st.info(f"** Route of Entry:**\n{data['Route']}")
             with col2:
-                st.warning(f"**🎯 Target:**\n{data['Target']}")
+                st.warning(f"** Target:**\n{data['Target']}")
             
-            st.success(f"**🤒 Symptoms:**\n{data['Symptoms']}")
+            st.success(f"** Symptoms:**\n{data['Symptoms']}")
             found = True
             break
             
